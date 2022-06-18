@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/rootLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:id="@+id/adapterLayoutProfilePic"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="40dp"
+                android:src="@drawable/ic_baseline_account_circle_24"
+                android:layout_marginStart="20dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="20dp"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/adapterLayoutProfilePic">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:textSize="18sp"
+                    android:text="Full Name"
+                    android:id="@+id/adapterLayoutFullname"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:layout_marginTop="5dp"
+                    android:textColor="@color/theme_color"
+                    android:text="This is the Last message"
+                    android:id="@+id/adapterLayoutLastMessage"/>
+
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="20dp"
+                android:textColor="#FFFFFF"
+                android:gravity="center"
+                android:id="@+id/adapterLayoutUnseenMessage"
+                android:background="@drawable/round_back_theme_1000"
+                android:text="1"
+                />
+
+            
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
