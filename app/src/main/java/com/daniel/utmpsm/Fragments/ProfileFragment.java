@@ -1,5 +1,7 @@
 package com.daniel.utmpsm.Fragments;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.daniel.utmpsm.R;
+import com.daniel.utmpsm.Utilities.Constants;
+import com.daniel.utmpsm.Utilities.PreferenceManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -40,7 +44,7 @@ import java.util.concurrent.Executor;
 /**
 
  */
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment  {
 
      EditText profileFullName;
      Button profileUpdateButton;
@@ -48,6 +52,8 @@ public class ProfileFragment extends Fragment {
      FirebaseAuth firebaseAuth;
      FirebaseFirestore firebaseFirestore;
      String userID,updatedFullName;
+
+    private PreferenceManager preferenceManager;
 
 
     @Override
@@ -62,6 +68,9 @@ public class ProfileFragment extends Fragment {
         profileFullName = view.findViewById(R.id.profileFullName);
         profileEmail = view.findViewById(R.id.profileEmail);
         profileUpdateButton = view.findViewById(R.id.profileUpdateButton);
+        preferenceManager = new PreferenceManager(getActivity().getApplicationContext());
+        SharedPreferences preferences = this.getActivity().getSharedPreferences(Constants.KEY_PREFERENCE_NAME, Context.MODE_PRIVATE);
+
 
         DocumentReference documentReference = firebaseFirestore.collection("Users").document(userID);
         documentReference.addSnapshotListener( new EventListener<DocumentSnapshot>() {
@@ -100,6 +109,7 @@ public class ProfileFragment extends Fragment {
                     firebaseFirestore.collection("Users").document(documentID).update(userDetail).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
+                            preferenceManager.putString(Constants.KEY_NAME,fullName);
                             showMessage("Successfully updated");
                         }
                     }).addOnFailureListener(new OnFailureListener() {
@@ -123,4 +133,6 @@ public class ProfileFragment extends Fragment {
         Toast.makeText(getContext(),message, Toast.LENGTH_SHORT).show();
 
     }
+
+
 }

@@ -17,6 +17,7 @@ public class PreferenceManager {
         editor.apply();
     }
 
+
     public Boolean getBoolean(String key){
         return sharedPreferences.getBoolean(key,false);
 
@@ -36,5 +37,13 @@ public class PreferenceManager {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
+    }
+
+    public void registerPref(SharedPreferences.OnSharedPreferenceChangeListener listener){
+        sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    public void unRegisterPref(SharedPreferences.OnSharedPreferenceChangeListener listener){
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener);
     }
 }

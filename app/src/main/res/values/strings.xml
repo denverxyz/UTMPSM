@@ -14,4 +14,8 @@
     <string name="menu_logout">Log Out</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="message">Message</string>
+    <string name="Chat" />
+    <string name="utm_psm">UTM PSM</string>
+    <string name="type_a_message">Type A Message</string>
 </resources>

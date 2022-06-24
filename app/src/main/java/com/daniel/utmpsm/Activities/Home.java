@@ -1,6 +1,7 @@
 package com.daniel.utmpsm.Activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -36,16 +37,13 @@ import com.virgilsecurity.android.ethree.interaction.EThree;
 
 import java.util.HashMap;
 import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 
 public class Home extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
-   // FirebaseUser firebaseUser;
-    //FirebaseAuth firebaseAuth;
-   // private FirebaseFirestore firebaseFirestore;
-   // String userID;
-    private EThree eThreeUser;
     private PreferenceManager preferenceManager;
+    private String changedUsername;
 
 
     @Override
@@ -55,6 +53,8 @@ public class Home extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         preferenceManager = new PreferenceManager(getApplicationContext());
+        changedUsername = preferenceManager.getString(Constants.KEY_NAME);
+        updateNavHeader();
 
 
         //init
@@ -77,7 +77,7 @@ public class Home extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        updateNavHeader();
+
     }
 
         @Override
@@ -145,7 +145,6 @@ public class Home extends AppCompatActivity
                     .addOnFailureListener(e -> Log.e("LOGOUT","Unable to log out"));
 
             FirebaseAuth.getInstance().signOut();
-            eThreeUser.cleanup();
             Intent loginActivity = new Intent(getApplicationContext(),LoginActivity.class);
             startActivity(loginActivity);
             finish();
@@ -164,10 +163,24 @@ public class Home extends AppCompatActivity
         View headerView = navigationView.getHeaderView(0);
         TextView navUsername = headerView.findViewById(R.id.navUserName);
         TextView navEmail = headerView.findViewById(R.id.navEmail);
-        navUsername.setText(preferenceManager.getString(Constants.KEY_NAME));
+
+        navUsername.setText(changedUsername);
         navEmail.setText(preferenceManager.getString(Constants.KEY_EMAIL));
 
 
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        NavigationView navigationView =findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+        TextView navUsername = headerView.findViewById(R.id.navUserName);
+
+
+        if(s.equals(Constants.KEY_NAME)){
+            navUsername.setText(preferenceManager.getString(Constants.KEY_NAME));
+
+        }
     }
 /**
     public void updateToken(String token){
@@ -180,5 +193,15 @@ public class Home extends AppCompatActivity
         DocumentReference documentReference = firebaseFirestore.collection()
     }
 **/
+    @Override
+    protected void onStart() {
+        super.onStart();
+        preferenceManager.registerPref(this);
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        preferenceManager.unRegisterPref(this);
+    }
 }

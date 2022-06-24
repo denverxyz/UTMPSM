@@ -1,84 +1,97 @@
 package com.daniel.utmpsm.Adapters;
 
 
-import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.daniel.utmpsm.Activities.MemoryData;
-import com.daniel.utmpsm.List.ChatList;
-import com.daniel.utmpsm.R;
+import com.daniel.utmpsm.Models.ChatMessage;
+import com.daniel.utmpsm.databinding.ItemContainerReceivedMessageBinding;
+import com.daniel.utmpsm.databinding.ItemContainterSentMessageBinding;
 
 import java.util.List;
 
-public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> {
+public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<ChatList> chatLists;
-    private final Context context;
-    private String userEmail;
+    private final List<ChatMessage> chatMessages;
+    private final String senderId;
 
-    public ChatAdapter(List<ChatList> chatLists, Context context) {
-        this.chatLists = chatLists;
-        this.context = context;
-        this.userEmail = MemoryData.getData(context);
+    public static final int VIEW_TYPE_SENT = 1;
+    public static final int VIEW_TYPE_RECEIVED = 2;
+
+    public ChatAdapter(List<ChatMessage> chatMessages, String senderId) {
+        this.chatMessages = chatMessages;
+        this.senderId = senderId;
     }
+
+
 
     @NonNull
     @Override
-    public ChatAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new MyViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_adapter_layout, null));
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == VIEW_TYPE_SENT){
+            return new SentMessageViewHolder(ItemContainterSentMessageBinding.inflate
+                    (LayoutInflater.from(parent.getContext()),parent,false));
+        }else {
+            return new ReceivedMessageViewHolder(ItemContainerReceivedMessageBinding.inflate
+                    (LayoutInflater.from(parent.getContext()),parent,false));
+
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ChatAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (getItemViewType(position) == VIEW_TYPE_SENT){
+            ((SentMessageViewHolder)holder).setData(chatMessages.get(position));
 
-        ChatList list2 = chatLists.get(position);
-
-        if(list2.getEmail().equals(userEmail)){
-            holder.myLayout.setVisibility(View.VISIBLE);
-            holder.oppoLayout.setVisibility(View.GONE);
-
-            holder.myMessage.setText(list2.getMessage());
-            holder.myTime.setText(list2.getDate()+" "+list2.getTime());
         }
-        else{
-            holder.myLayout.setVisibility(View.GONE);
-            holder.oppoLayout.setVisibility(View.VISIBLE);
-
-            holder.oppoMessage.setText(list2.getMessage());
-            holder.oppoTime.setText(list2.getDate()+" "+list2.getTime());
+        else {
+            ((ReceivedMessageViewHolder)holder).setData(chatMessages.get(position));
         }
     }
 
     @Override
     public int getItemCount() {
-        return chatLists.size();
+        return chatMessages.size();
     }
 
-    public void updateChatList(List<ChatList> chatLists){
-        this.chatLists = chatLists;
+    @Override
+    public int getItemViewType(int position) {
+        if(chatMessages.get(position).senderId.equals(senderId)){return VIEW_TYPE_SENT;}
+        else {return VIEW_TYPE_RECEIVED;}
     }
-    static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        private LinearLayout oppoLayout, myLayout;
-        private TextView oppoMessage, myMessage;
-        private TextView oppoTime, myTime;
+    static class SentMessageViewHolder extends RecyclerView.ViewHolder{
 
-        public MyViewHolder(@NonNull View itemView) {
-            super(itemView);
+        private final ItemContainterSentMessageBinding binding;
 
-            oppoLayout = itemView.findViewById(R.id.oppoLayout);
-            myLayout = itemView.findViewById(R.id.myLayout);
-            oppoMessage = itemView.findViewById(R.id.oppoMessage);
-            myMessage = itemView.findViewById(R.id.myMessage);
-            oppoTime = itemView.findViewById(R.id.oppoMsgTime);
-            myTime = itemView.findViewById(R.id.myMsgTime);
+
+        public SentMessageViewHolder(ItemContainterSentMessageBinding itemContainterSentMessageBinding) {
+            super(itemContainterSentMessageBinding.getRoot());
+            binding = itemContainterSentMessageBinding;
+        }
+
+        void setData(ChatMessage chatMessage){
+            binding.textMessage.setText(chatMessage.message);
+            binding.textDateTime.setText(chatMessage.dateTime);
         }
     }
+
+    static class ReceivedMessageViewHolder extends RecyclerView.ViewHolder{
+
+        private final ItemContainerReceivedMessageBinding binding;
+
+        public ReceivedMessageViewHolder(ItemContainerReceivedMessageBinding itemContainerReceivedMessageBinding) {
+            super(itemContainerReceivedMessageBinding.getRoot());
+            binding = itemContainerReceivedMessageBinding;
+        }
+
+        void setData(ChatMessage chatMessage){
+            binding.textMessage.setText(chatMessage.message);
+            binding.textDateTime.setText(chatMessage.dateTime);
+        }
+    }
+
 }

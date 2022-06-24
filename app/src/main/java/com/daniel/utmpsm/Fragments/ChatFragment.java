@@ -1,169 +1,95 @@
 package com.daniel.utmpsm.Fragments;
 
-import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.daniel.utmpsm.Activities.MemoryData;
-import com.daniel.utmpsm.List.MessagesList;
-import com.daniel.utmpsm.Adapters.MessageAdapter;
-import com.daniel.utmpsm.R;
+import com.daniel.utmpsm.Activities.Chat;
+import com.daniel.utmpsm.Activities.UsersActivity;
+import com.daniel.utmpsm.Adapters.RecentConversionsAdapter;
+import com.daniel.utmpsm.Listeners.ConversionListener;
+import com.daniel.utmpsm.Models.ChatMessage;
+import com.daniel.utmpsm.Models.User;
 import com.daniel.utmpsm.Utilities.Constants;
 import com.daniel.utmpsm.Utilities.PreferenceManager;
+import com.daniel.utmpsm.databinding.FragmentChatBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class ChatFragment extends Fragment {
+public class ChatFragment extends Fragment implements ConversionListener {
 
-    private String email;
-    private String name;
-    private RecyclerView messageRecyclerView;
-    private MessageAdapter messagesAdapter;
-    private final List<MessagesList> messagesLists = new ArrayList<>();
-    private int unseenMessages = 0;
-    private String lastMessage = "";
-    private String chatKey = "";
+
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+    private FragmentChatBinding binding;
     PreferenceManager preferenceManager;
+    private List<ChatMessage> conversations;
+    private RecentConversionsAdapter conversionsAdapter;
+    private FirebaseFirestore database;
 
-
-    private boolean dataSet = false;
-    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://utm-psm-default-rtdb.firebaseio.com/");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View privateChatView = inflater.inflate(R.layout.fragment_chat, container, false);
-        messageRecyclerView = privateChatView.findViewById(R.id.messageRecyclerView);
-        messageRecyclerView.setLayoutManager(new LinearLayoutManager(privateChatView.getContext()));
 
-        messageRecyclerView.setHasFixedSize(true);
-
-
-        messagesAdapter = new MessageAdapter(messagesLists,privateChatView.getContext());
-        messageRecyclerView.setAdapter(messagesAdapter);
-        preferenceManager = new PreferenceManager(privateChatView.getContext());
-
+        binding = FragmentChatBinding.inflate(inflater,container,false);
+        View view = binding.getRoot();
+        preferenceManager = new PreferenceManager(view.getContext());
+        init();
         getToken();
+        setListeners();
+        listenConversation();
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            private static final String TAG = "TAG" ;
+        return view;
 
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+    }
 
-                messagesLists.clear();
-                unseenMessages = 0;
-                lastMessage = "";
-                chatKey = "";
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 
-                for(DataSnapshot dataSnapshot : snapshot.child("Users").getChildren()){
+    private void setListeners() {
+        binding.fabNewChat.setOnClickListener(view -> startActivity(new Intent(getActivity().getApplicationContext(), UsersActivity.class)));
+    }
 
-                    final String getUid = dataSnapshot.getKey();
+    private void listenConversation(){
+        database.collection(Constants.KEY_CONVERSATIONS)
+                .whereEqualTo(Constants.KEY_SENDER_ID,preferenceManager.getString(Constants.KEY_USER_ID))
+                .addSnapshotListener(eventListener);
 
-                    dataSet = false;
+        database.collection(Constants.KEY_CONVERSATIONS)
+                .whereEqualTo(Constants.KEY_RECEIVER_ID,preferenceManager.getString(Constants.KEY_USER_ID))
+                .addSnapshotListener(eventListener);
+    }
 
-
-
-                    if(!getUid.equals(firebaseUser.getUid())){
-
-                        final String getName = dataSnapshot.child("FullName").getValue(String.class);
-                        //final String getProfilePic = dataSnapshot.child("profile_pic").getValue(String.class);
-
-                        databaseReference.child("chat").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                                int getChatCounts = (int)snapshot.getChildrenCount();
-
-                                if(getChatCounts > 0){
-
-                                    for (DataSnapshot dataSnapshot1 : snapshot.getChildren()){
-
-                                        final String getKey = dataSnapshot1.getKey();
-                                        chatKey = getKey;
-
-                                        if(dataSnapshot1.hasChild("user_1") && dataSnapshot1.hasChild("user_2") && dataSnapshot1.hasChild("messages")){
-                                            final String getUserOne = dataSnapshot1.child("user_1").getValue(String.class);
-                                            final String getUserTwo = dataSnapshot1.child("user_2").getValue(String.class);
-
-                                            if((getUserOne.equals(getUid) && getUserTwo.equals(firebaseUser.getUid())) || (getUserOne.equals(firebaseUser.getUid()) && getUserTwo.equals(getUid))){
-
-                                                for(DataSnapshot chatDataSnapshot : dataSnapshot1.child("messages").getChildren()){
-
-                                                    final long getMessageKey = Long.parseLong(chatDataSnapshot.getKey());
-                                                    final long getLastSeenMessage = Long.parseLong(MemoryData.getLastMsgTS(getActivity(), getKey));
-
-                                                    lastMessage = chatDataSnapshot.child("msg").getValue(String.class);
-                                                    if(getMessageKey > getLastSeenMessage){
-                                                        unseenMessages++;
-                                                    }
-
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                MessagesList messagesList = new MessagesList(getName,  lastMessage,unseenMessages, chatKey);
-                                messagesLists.add(messagesList);
-                                messagesAdapter.updateData(messagesLists);
-
-                                if(!dataSet){
-                                    Log.v(TAG,"snapshot count = "+dataSet);
-                                    dataSet = true;
-                                    //MessagesList messagesList = new MessagesList(getName,  lastMessage,unseenMessages, chatKey);
-                                   // messagesLists.add(messagesList);
-                                   // messagesAdapter.updateData(messagesLists);
-                                }
-
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
-
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-
-
-
-
-        return privateChatView;
-
+    private void init(){
+        conversations = new ArrayList<>();
+        conversionsAdapter = new RecentConversionsAdapter(conversations, this);
+        binding.conversationsRecyclerView.setAdapter(conversionsAdapter);
+        database = FirebaseFirestore.getInstance();
     }
 
     private void updateToken(String token){
@@ -173,6 +99,60 @@ public class ChatFragment extends Fragment {
         documentReference.update(Constants.KEY_FCM_TOKEN,token).addOnSuccessListener(unused -> showMessage("Token Updated Successfully")).addOnFailureListener(e -> showMessage("Unable to update token"));
     }
 
+    private final EventListener<QuerySnapshot> eventListener =  (value, error) -> {
+        if(error != null){
+            showMessage(error.getMessage());
+        }
+        if (value != null){
+            for (DocumentChange documentChange : value.getDocumentChanges()){
+                if (documentChange.getType() == DocumentChange.Type.ADDED){
+                    String senderID = documentChange.getDocument().getString(Constants.KEY_SENDER_ID);
+                    String receiverID = documentChange.getDocument().getString(Constants.KEY_RECEIVER_ID);
+
+                    ChatMessage chatMessage = new ChatMessage();
+                    chatMessage.senderId = senderID;
+                    chatMessage.receiverId = receiverID;
+
+                    if (preferenceManager.getString(Constants.KEY_USER_ID).equals(senderID)){
+                        chatMessage.conversionID = documentChange.getDocument().getString(Constants.KEY_RECEIVER_ID);
+                        chatMessage.conversionName = documentChange.getDocument().getString(Constants.KEY_RECEIVER_NAME);
+
+                    } else {
+                        chatMessage.conversionID = documentChange.getDocument().getString(Constants.KEY_SENDER_ID);
+                        chatMessage.conversionName = documentChange.getDocument().getString(Constants.KEY_SENDER_NAME);
+
+                    }
+
+                    chatMessage.message = documentChange.getDocument().getString(Constants.KEY_LAST_MESSAGE);
+                    chatMessage.dateObject = documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP);
+                    conversations.add(chatMessage);
+
+                }else if (documentChange.getType() == DocumentChange.Type.MODIFIED) {
+                    for (int i=0;i<conversations.size();i++){
+                        String senderID = documentChange.getDocument().getString(Constants.KEY_SENDER_ID);
+                        String receiverID = documentChange.getDocument().getString(Constants.KEY_RECEIVER_ID);
+                        if (conversations.get(i).senderId.equals(senderID) && conversations.get(i).receiverId.equals(receiverID)){
+                            conversations.get(i).message = documentChange.getDocument().getString(Constants.KEY_LAST_MESSAGE);
+                            conversations.get(i).dateObject = documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP);
+                            break;
+
+                        }
+
+                    }
+
+                }
+            }
+            binding.conversationsRecyclerView.setAdapter(conversionsAdapter);
+            Collections.sort(conversations,(obj1, obj2) -> obj2.dateObject.compareTo(obj1.dateObject));
+            conversionsAdapter.notifyDataSetChanged();
+            binding.conversationsRecyclerView.smoothScrollToPosition(0);
+
+
+
+        }
+
+    };
+
     private void getToken(){
         FirebaseMessaging.getInstance().getToken().addOnSuccessListener(this::updateToken);
     }
@@ -180,6 +160,24 @@ public class ChatFragment extends Fragment {
     private void showMessage(String message) {
 
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+
+    }
+    public void onConversionClicked(User user){
+        binding.progressBar.setVisibility(View.VISIBLE);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+
+            public void run() {
+
+                Intent intent = new Intent(getActivity(), Chat.class);
+                intent.putExtra(Constants.KEY_USER,user);
+                startActivity(intent);
+
+            }
+        }, 5000);
+
+        binding.progressBar.setVisibility(View.GONE);
+
 
     }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.daniel.utmpsm">
+    package="com.daniel.utmpsm"
+    >
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -17,14 +18,16 @@
         <activity
             android:name=".Activities.Home"
             android:exported="false"
-            android:label="@string/title_activity_home"
+            android:label="@string/utm_psm"
             android:theme="@style/Theme.UTMPSM.NoActionBar" />
         <activity
             android:name=".Activities.RegisterActivity"
             android:exported="false" />
         <activity
             android:name=".Activities.Chat"
-            android:exported="false" />
+            android:exported="false"
+            android:label="@string/Chat"
+            android:theme="@style/AppTheme"/>
         <activity
             android:name=".Activities.HomeActivity"
             android:exported="false" />
