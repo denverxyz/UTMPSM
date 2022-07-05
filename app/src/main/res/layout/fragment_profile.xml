@@ -10,65 +10,64 @@
 
     <TextView
         android:id="@+id/bannerEmail"
-        android:layout_width="99dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="264dp"
+        android:layout_width="101dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="68dp"
+        android:layout_marginEnd="16dp"
         android:gravity="center"
         android:text="Full Name:"
         android:textAlignment="center"
+
         android:textSize="15dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.06"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.781" />
+        app:layout_constraintEnd_toStartOf="@+id/profileFullName"
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
     <TextView
         android:id="@+id/banner"
         android:layout_width="116dp"
-        android:layout_height="44dp"
-        android:layout_marginBottom="316dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="68dp"
         android:gravity="center"
         android:text="Email Address:"
         android:textAlignment="center"
         android:textSize="15dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.054"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bannerEmail" />
 
     <EditText
         android:id="@+id/profileFullName"
         android:layout_width="228dp"
         android:layout_height="48dp"
+        android:layout_marginTop="68dp"
         android:layout_marginEnd="32dp"
         android:clickable="false"
+        android:gravity="center_vertical"
         android:hint="Enter Full Name here"
         android:textSize="15dp"
-        app:layout_constraintBottom_toTopOf="@+id/profileEmail"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.815" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
     <TextView
         android:id="@+id/profileEmail"
         android:layout_width="228dp"
         android:layout_height="48dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="316dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="68dp"
         android:ems="10"
+        android:gravity="center_vertical"
         android:hint="Enter Email here"
         android:inputType="textPersonName"
         android:textSize="15dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/banner"
+        app:layout_constraintTop_toBottomOf="@+id/profileFullName" />
 
     <Button
         android:id="@+id/profileUpdateButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
         android:text="Update Profile"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profileEmail" />
@@ -77,8 +76,8 @@
         android:id="@+id/imageView2"
         android:layout_width="175dp"
         android:layout_height="167dp"
+        android:layout_marginTop="68dp"
         android:src="@drawable/headerimage"
-        app:layout_constraintBottom_toTopOf="@+id/profileFullName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

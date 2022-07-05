@@ -61,6 +61,7 @@ public class Chat extends AppCompatActivity {
     private String conversionID = null;
     private String plainText,cipherText;
     private KeyPair keyPair = null;
+    KeyStore.PrivateKeyEntry privateKeyEntry = null;
 
     private KeyStore keyStore = null;
 
@@ -84,7 +85,7 @@ public class Chat extends AppCompatActivity {
             public void run() {
                 setEncryptionMethod();
             }
-        }, 5000);
+        }, 2000);
 
 
         setListeners();
@@ -94,7 +95,7 @@ public class Chat extends AppCompatActivity {
             public void run() {
                 listenMessage();
             }
-        }, 5000);
+        }, 2000);
 
 
 
@@ -109,6 +110,13 @@ public class Chat extends AppCompatActivity {
         binding.chatRecyclerView.setAdapter(chatAdapter);
         firebaseFirestore = FirebaseFirestore.getInstance();
         receiverUser =(User) getIntent().getSerializableExtra(Constants.KEY_USER);
+        
+        try {
+            keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+        } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | IOException e) {
+            Log.e("TEST",e.getMessage());
+        }
 
 
     }  //end of init method
@@ -183,6 +191,23 @@ public class Chat extends AppCompatActivity {
         binding.inputMessage.setText(null);
     }
 
+    private void setEncryptionMethod() {
+
+        try {
+            privateKeyEntry  = (KeyStore.PrivateKeyEntry)keyStore.getEntry("AndroidKeyStore",null);
+        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableEntryException e) {
+            e.printStackTrace();
+        }
+        assert privateKeyEntry != null;
+        privateKeySender = privateKeyEntry.getPrivateKey();
+        Log.e("test",receiverUser.id);
+        firebaseFirestore.collection(Constants.KEY_COLLECTION_USERS).document(receiverUser.id);
+        publicKeyReceiver = EcdhFunction.getPublicKey(EcdhFunction.hexToBytes(receiverUser.publicKey));
+        secretKey = EcdhFunction.generateSharedSecret(privateKeySender,publicKeyReceiver);
+
+    }
+
+
     private void listenMessage(){
 
         firebaseFirestore.collection(Constants.KEY_COLLECTION_CHAT)
@@ -219,31 +244,6 @@ public class Chat extends AppCompatActivity {
           conversionID = documentSnapshot.getId();
       }
     };
-    private void setEncryptionMethod() {
-        try {
-            keyStore = KeyStore.getInstance("AndroidKeyStore");
-            keyStore.load(null);
-        } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | IOException e) {
-            Log.e("TEST",e.getMessage());
-        }
-
-
-        KeyStore.PrivateKeyEntry privateKeyEntry = null;
-        try {
-            privateKeyEntry  = (KeyStore.PrivateKeyEntry)keyStore.getEntry("AndroidKeyStore",null);
-        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableEntryException e) {
-            e.printStackTrace();
-        }
-        assert privateKeyEntry != null;
-        privateKeySender = privateKeyEntry.getPrivateKey();
-        Log.e("test",receiverUser.id);
-         firebaseFirestore.collection(Constants.KEY_COLLECTION_USERS).document(receiverUser.id);
-        publicKeyReceiver = EcdhFunction.getPublicKey(EcdhFunction.hexToBytes(receiverUser.publicKey));
-        secretKey = EcdhFunction.generateSharedSecret(privateKeySender,publicKeyReceiver);
-
-
-
-    }
 
 
 

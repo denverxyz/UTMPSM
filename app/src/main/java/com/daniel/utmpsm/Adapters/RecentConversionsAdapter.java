@@ -68,16 +68,7 @@ public class RecentConversionsAdapter extends  RecyclerView.Adapter<RecentConver
                 User user = new User();
                 user.id= chatMessage.conversionID;
                 user.name = chatMessage.conversionName;
-                FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-                DocumentReference documentReference = firebaseFirestore.collection(Constants.KEY_COLLECTION_USERS).document(user.id);
-                documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                        user.publicKey = value.getString(Constants.KEY_PUBLIC_KEY);
-                    }
-                });
-
-                        conversionListener.onConversionClicked(user);
+                conversionListener.onConversionClicked(user);
 
 
             });

@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.daniel.utmpsm"
-    >
+    xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature android:glEsVersion="0x00030000" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen.multitouch" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen.multitouch.distinct" android:required="false" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera.ar" android:required="true" />
+    <uses-feature android:name="com.google.ar.core.depth" android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -11,7 +22,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.UTMPSM">
+        android:theme="@style/Theme.UTMPSM"
+        tools:replace="android:icon">
         <activity
             android:name=".Activities.UsersActivity"
             android:exported="false" />
@@ -28,6 +40,16 @@
             android:exported="false"
             android:label="@string/Chat"
             android:theme="@style/AppTheme"/>
+        <activity android:name="com.unity3d.player.UnityPlayerActivity"
+            android:theme="@style/UnityThemeSelector" android:screenOrientation="fullSensor"
+            android:launchMode="singleTask" android:maxAspectRatio="1.86"
+            android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection|density"
+            android:resizeableActivity="false"
+            android:hardwareAccelerated="false"
+            android:exported="true">
+            <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
+            <meta-data android:name="android.notch_support" android:value="true" />
+        </activity>
         <activity
             android:name=".Activities.HomeActivity"
             android:exported="false" />
@@ -36,7 +58,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -49,5 +70,13 @@
             </intent-filter>
         </service>
     </application>
+
+    <meta-data android:name="unity.splash-mode" android:value="0" />
+    <meta-data android:name="unity.splash-enable" android:value="True" />
+    <meta-data android:name="unity.allow-resizable-window" android:value="False" />
+    <meta-data android:name="notch.config" android:value="portrait|landscape" />
+    <meta-data android:name="unity.build-id" android:value="8709f9dd-7426-4c92-8c92-bd7c2cedac3c" />
+    <meta-data android:name="unityplayer.SkipPermissionsDialog" android:value="true" />
+    <meta-data android:name="com.google.ar.core" android:value="required" />
 
 </manifest>

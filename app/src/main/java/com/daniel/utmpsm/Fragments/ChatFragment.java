@@ -3,10 +3,12 @@ package com.daniel.utmpsm.Fragments;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +20,12 @@ import com.daniel.utmpsm.Adapters.RecentConversionsAdapter;
 import com.daniel.utmpsm.Listeners.ConversionListener;
 import com.daniel.utmpsm.Models.ChatMessage;
 import com.daniel.utmpsm.Models.User;
+import com.daniel.utmpsm.R;
 import com.daniel.utmpsm.Utilities.Constants;
 import com.daniel.utmpsm.Utilities.PreferenceManager;
 import com.daniel.utmpsm.databinding.FragmentChatBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
@@ -30,6 +35,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.installations.Utils;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
@@ -44,6 +50,7 @@ public class ChatFragment extends Fragment implements ConversionListener {
     private FragmentChatBinding binding;
     PreferenceManager preferenceManager;
     private List<ChatMessage> conversations;
+    private String userPublicKey;
     private RecentConversionsAdapter conversionsAdapter;
     private FirebaseFirestore database;
 
@@ -65,12 +72,6 @@ public class ChatFragment extends Fragment implements ConversionListener {
 
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
-
     private void setListeners() {
         binding.fabNewChat.setOnClickListener(view -> startActivity(new Intent(getActivity().getApplicationContext(), UsersActivity.class)));
     }
@@ -83,6 +84,9 @@ public class ChatFragment extends Fragment implements ConversionListener {
         database.collection(Constants.KEY_CONVERSATIONS)
                 .whereEqualTo(Constants.KEY_RECEIVER_ID,preferenceManager.getString(Constants.KEY_USER_ID))
                 .addSnapshotListener(eventListener);
+
+        
+        
     }
 
     private void init(){
@@ -96,7 +100,8 @@ public class ChatFragment extends Fragment implements ConversionListener {
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         DocumentReference documentReference = database.collection(Constants.KEY_COLLECTION_USERS).document(preferenceManager.getString(Constants.KEY_USER_ID));
 
-        documentReference.update(Constants.KEY_FCM_TOKEN,token).addOnSuccessListener(unused -> showMessage("Token Updated Successfully")).addOnFailureListener(e -> showMessage("Unable to update token"));
+
+        documentReference.update(Constants.KEY_FCM_TOKEN,token).addOnSuccessListener(unused -> Log.d("Token","Token Updated")).addOnFailureListener(e -> Log.d("Token",e.getMessage()));
     }
 
     private final EventListener<QuerySnapshot> eventListener =  (value, error) -> {
@@ -142,10 +147,14 @@ public class ChatFragment extends Fragment implements ConversionListener {
 
                 }
             }
-            binding.conversationsRecyclerView.setAdapter(conversionsAdapter);
-            Collections.sort(conversations,(obj1, obj2) -> obj2.dateObject.compareTo(obj1.dateObject));
-            conversionsAdapter.notifyDataSetChanged();
-            binding.conversationsRecyclerView.smoothScrollToPosition(0);
+
+                    binding.conversationsRecyclerView.setAdapter(conversionsAdapter);
+                    Collections.sort(conversations, (obj1, obj2) -> obj2.dateObject.compareTo(obj1.dateObject));
+                    conversionsAdapter.notifyDataSetChanged();
+                    binding.conversationsRecyclerView.smoothScrollToPosition(0);
+
+
+
 
 
 
@@ -162,22 +171,30 @@ public class ChatFragment extends Fragment implements ConversionListener {
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
 
     }
+    private interface FirestoreCallback{
+        void onCallback(String publicKey);
+    }
+
+    private void readData(FirestoreCallback firestoreCallback){
+
+    }
+
     public void onConversionClicked(User user){
+
         binding.progressBar.setVisibility(View.VISIBLE);
-        new Handler().postDelayed(new Runnable() {
+        FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_USERS).document(user.id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
 
-            public void run() {
-
-                Intent intent = new Intent(getActivity(), Chat.class);
-                intent.putExtra(Constants.KEY_USER,user);
-                startActivity(intent);
-
+                    String publicKey = task.getResult().getString(Constants.KEY_PUBLIC_KEY);
+                    user.publicKey = publicKey;
+                    Intent intent = new Intent(getActivity(), Chat.class);
+                    intent.putExtra(Constants.KEY_USER,user);
+                    binding.progressBar.setVisibility(View.GONE);
+                    startActivity(intent);
+                }
             }
-        }, 5000);
-
-        binding.progressBar.setVisibility(View.GONE);
-
-
+        });
     }
 }

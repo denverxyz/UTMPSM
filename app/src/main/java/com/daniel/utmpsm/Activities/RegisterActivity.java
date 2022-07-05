@@ -70,6 +70,7 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_register);
 
         //set var with view
@@ -93,10 +94,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                //hide button and progress
                 hideButton();
-
-                //email string get from Editext
                 final String email = guestEmail.getText().toString();
 
                 //if email empty
@@ -139,11 +137,9 @@ public class RegisterActivity extends AppCompatActivity {
 
                                 userID = mAuth.getCurrentUser().getUid();
 
-                                try {
-                                    keyPair = EcdhFunction.generateKeyPair();
-                                } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | NoSuchProviderException e ) {
-                                    e.printStackTrace();
-                                }
+                                keyPair = EcdhFunction.generateKeyPair();
+
+
                                 publicKey = keyPair.getPublic();
                                 privateKey = keyPair.getPrivate();
 
@@ -164,7 +160,7 @@ public class RegisterActivity extends AppCompatActivity {
                                             Log.i(TAG, "onComplete: test2");
                                         } else {
                                             showMessage("Profile cannot be saved at the moment...");
-                                            Log.i(TAG, "onComplete: test3");
+
                                         }
                                     }
                                 });

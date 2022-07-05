@@ -25,9 +25,6 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
-import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.EncodedKeySpec;
@@ -48,13 +45,19 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class EcdhFunction {
 
-    public static KeyPair generateKeyPair() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException {
-        KeyPairGenerator keyPairGeneratorSpi = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
-        keyPairGeneratorSpi.initialize(new KeyGenParameterSpec.Builder(
-                "AndroidKeyStore",
-                PURPOSE_AGREE_KEY)
-                .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
-                .build());
+    public static KeyPair generateKeyPair() {
+        KeyPairGenerator keyPairGeneratorSpi = null;
+        try {
+            keyPairGeneratorSpi = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
+            keyPairGeneratorSpi.initialize(new KeyGenParameterSpec.Builder(
+                    "AndroidKeyStore",
+                    PURPOSE_AGREE_KEY)
+                    .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
+                    .build());
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        }
+
         KeyPair pair = keyPairGeneratorSpi.generateKeyPair();
         return pair;
     }
@@ -65,8 +68,6 @@ public class EcdhFunction {
     private static byte[] decode(String data) {
         return Base64.getDecoder().decode(data);
     }
-
-
 
     public static SecretKey generateSharedSecret(PrivateKey privateKey,
                                                  PublicKey publicKey) {

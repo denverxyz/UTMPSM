@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "232349693392",
+    "firebase_url": "https://utm-psm-default-rtdb.firebaseio.com",
     "project_id": "utm-psm",
     "storage_bucket": "utm-psm.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "232349693392-khhcigst4ps5oljv817nhohivh74oue0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.daniel.utmpsm",
+            "certificate_hash": "f7d0530e4e54f0b58486e7aa9b755bb6f1d2affd"
+          }
+        },
         {
           "client_id": "232349693392-v2ogktqkknhd9lvr0q55uhp176h4fb7b.apps.googleusercontent.com",
           "client_type": 3
@@ -27,7 +36,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "232349693392-v2ogktqkknhd9lvr0q55uhp176h4fb7b.apps.googleusercontent.com",
+              "client_id": "232349693392-g2arcg7ivt7br19dk520q38ctr9qqdh4.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

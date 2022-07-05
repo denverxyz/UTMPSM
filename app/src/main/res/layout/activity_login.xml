@@ -7,96 +7,64 @@
     android:background="#02BBD2"
     tools:context=".Activities.LoginActivity">
 
-    <EditText
-        android:id="@+id/studentName"
-        android:layout_width="287dp"
-        android:layout_height="48dp"
-        android:ems="10"
-        android:hint="Username"
-        android:inputType="textPersonName"
-        android:minHeight="48dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.393" />
-
-    <EditText
-        android:id="@+id/studentPassword"
-        android:layout_width="285dp"
-        android:layout_height="48dp"
-        android:layout_marginBottom="296dp"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:minHeight="48dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/studentName"
-        app:layout_constraintVertical_bias="0.171" />
-
-    <Button
-        android:id="@+id/studentLoginButton"
-        android:layout_width="285dp"
-        android:layout_height="48dp"
-        android:text="Login"
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/gsignin"
+        android:layout_width="223dp"
+        android:layout_height="67dp"
+        android:layout_marginBottom="164dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/studentPassword"
-        app:layout_constraintVertical_bias="0.045" />
-
-    <Button
-        android:id="@+id/registerButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:text="Guest Login"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/studentLoginButton"
+        app:layout_constraintTop_toBottomOf="@+id/loginText"
         app:layout_constraintVertical_bias="1.0" />
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="359dp"
         android:layout_height="110dp"
-        app:layout_constraintBottom_toTopOf="@+id/studentName"
+        android:layout_marginTop="28dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.257"
         app:srcCompat="@drawable/utmlogo" />
 
     <TextView
         android:id="@+id/bannerLogin"
-        android:layout_width="119dp"
-        android:layout_height="38dp"
-        android:text="Log In"
+        android:layout_width="284dp"
+        android:layout_height="97dp"
+        android:layout_marginTop="56dp"
+        android:gravity="center"
+        android:text="Welcome To UTM Smart Navigation"
         android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@+id/studentName"
+        android:textSize="@dimen/_25sdp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.523"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView"
-        app:layout_constraintVertical_bias="0.637" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+    <TextView
+        android:id="@+id/loginText"
+        android:layout_width="305dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="80dp"
+        android:gravity="center"
+        android:text="Log In using Google"
+        android:textAlignment="center"
+        android:textSize="@dimen/_15sdp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bannerLogin" />
 
     <ProgressBar
         android:id="@+id/loginProgressBar"
         style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
+        android:layout_width="69dp"
+        android:layout_height="57dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="168dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/registerButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/studentLoginButton" />
+        app:layout_constraintTop_toBottomOf="@+id/gsignin" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

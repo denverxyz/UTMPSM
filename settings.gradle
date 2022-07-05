@@ -13,7 +13,18 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         jcenter()
+        flatDir {
+            dirs (rootDir,'unityLibrary/libs')
+        }
+
+        //flatDir {
+         //   dirs (rootDir,'unityLibrary/libs')
+        //}
     }
 }
 rootProject.name = "UTM PSM"
 include ':app'
+//include ':unityLibrary'
+//project(':unityLibrary').projectDir=new File(rootDir,'unityLibrary')
+include ':unityLibrary'
+include ':launcher'
